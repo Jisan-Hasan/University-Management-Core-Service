@@ -1,4 +1,6 @@
 import { AcademicSemester, Prisma } from '@prisma/client';
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
@@ -76,7 +78,18 @@ const getAllFromDB = async (
   };
 };
 
+const getDataById = async (id: string): Promise<AcademicSemester | null> => {
+  const result = await prisma.academicSemester.findUnique({ where: { id } });
+
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Academic Semester not found');
+  }
+
+  return result;
+};
+
 export const AcademicSemesterService = {
   insertIntoDB,
   getAllFromDB,
+  getDataById,
 };

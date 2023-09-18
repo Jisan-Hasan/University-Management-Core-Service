@@ -1,4 +1,6 @@
 import { AcademicFaculty, Prisma } from '@prisma/client';
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
@@ -76,7 +78,22 @@ const getAllFromDB = async (
   };
 };
 
+const getByIdFromDB = async (id: string): Promise<AcademicFaculty | null> => {
+  const result = await prisma.academicFaculty.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'AcademicFaculty not found');
+  }
+
+  return result;
+};
+
 export const AcademicFacultyService = {
   insertIntoDB,
   getAllFromDB,
+  getByIdFromDB,
 };

@@ -36,10 +36,35 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
   const result = await AcademicFacultyService.getByIdFromDB(req.params.id);
 
-  sendResponse(res, {
+  sendResponse<AcademicFaculty>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'AcademicFaculty fetched successfully',
+    data: result,
+  });
+});
+
+const updateOneInDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await AcademicFacultyService.updateOneInDB(
+    req.params.id,
+    req.body
+  );
+
+  sendResponse<AcademicFaculty>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'AcademicFaculty updated successfully',
+    data: result,
+  });
+});
+
+const deleteByIdFromDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await AcademicFacultyService.deleteByIdFromDB(req.params.id);
+
+  sendResponse<AcademicFaculty>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'AcademicFaculty delete successfully',
     data: result,
   });
 });
@@ -48,4 +73,6 @@ export const AcademicFacultyController = {
   insertIntoDB,
   getAllFromDB,
   getByIdFromDB,
+  updateOneInDB,
+  deleteByIdFromDB,
 };

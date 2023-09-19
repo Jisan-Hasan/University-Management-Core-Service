@@ -14,4 +14,12 @@ router.post(
 router.get('/', StudentController.getAllFromDB);
 router.get('/:id', StudentController.getByIdFromDB);
 
+router.patch(
+  '/:id',
+  validateRequest(StudentValidation.update),
+  StudentController.updateByIdInDB
+);
+
+router.delete('/:id', StudentController.deleteByIdFromDB);
+
 export const StudentRoutes = router;

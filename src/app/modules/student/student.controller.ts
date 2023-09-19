@@ -45,8 +45,32 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateByIdInDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await StudentService.updateByIdInDB(req.params.id, req.body);
+
+  sendResponse<Student>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Student updated successfully',
+    data: result,
+  });
+});
+
+const deleteByIdFromDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await StudentService.deleteByIdFromDB(req.params.id);
+
+  sendResponse<Student>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Student deleted successfully',
+    data: result,
+  });
+});
+
 export const StudentController = {
   insertIntoDB,
   getAllFromDB,
   getByIdFromDB,
+  updateByIdInDB,
+  deleteByIdFromDB,
 };

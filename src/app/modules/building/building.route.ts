@@ -5,4 +5,6 @@ const router = express.Router();
 
 router.post('/', BuildingController.insertIntoDB);
 
+router.get('/', BuildingController.getAllFromDB);
+
 export const BuildingRoutes = router;

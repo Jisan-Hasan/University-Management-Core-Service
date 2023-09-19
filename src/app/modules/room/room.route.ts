@@ -14,4 +14,20 @@ router.post(
   RoomController.insertIntoDB
 );
 
+router.get('/', RoomController.getAllFromDB);
+router.get('/:id', RoomController.getByIdFromDB);
+
+router.patch(
+  '/:id',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  validateRequest(RoomValidation.update),
+  RoomController.updateOneInDB
+);
+
+router.delete(
+  '/:id',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  RoomController.deleteByIdFromDB
+);
+
 export const RoomRoutes = router;

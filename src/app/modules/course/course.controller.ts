@@ -6,7 +6,7 @@ import { CourseService } from './course.service';
 import { courseFilterableFields } from './course.constant';
 import { paginationFields } from '../../../constants/pagination';
 import pick from '../../../shared/pick';
-import { Course } from '@prisma/client';
+import { Course, CourseFaculty } from '@prisma/client';
 
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
   const result = await CourseService.insertIntoDB(req.body);
@@ -67,10 +67,25 @@ const deleteByIdFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const assignFaculties = catchAsync(async (req: Request, res: Response) => {
+  const result = await CourseService.assignFaculties(
+    req.params.id,
+    req.body.faculties
+  );
+
+  sendResponse<CourseFaculty[]>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Faculties assigned successfully',
+    data: result,
+  });
+});
+
 export const CourseController = {
   insertIntoDB,
   getAllFromDB,
   getByIdFromDB,
   updateOneInDB,
   deleteByIdFromDB,
+  assignFaculties,
 };

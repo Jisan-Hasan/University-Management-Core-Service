@@ -14,4 +14,13 @@ router.post(
   SemesterRegistrationController.insertIntoDB
 );
 
+router.get('/', SemesterRegistrationController.getAllFromDB);
+router.get('/:id', SemesterRegistrationController.getByIdFromDB);
+
+router.delete(
+  '/:id',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  SemesterRegistrationController.deleteByIdFromDB
+);
+
 export const semesterRegistrationRoutes = router;

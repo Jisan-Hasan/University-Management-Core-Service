@@ -7,6 +7,7 @@ import ApiError from '../../errors/ApiError';
 
 import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
+import handleClientError from '../../errors/handleClientError';
 import handleValidationError from '../../errors/handleValidationError';
 import handleZodError from '../../errors/handleZodError';
 import { IGenericErrorMessage } from '../../interfaces/error';
@@ -28,6 +29,11 @@ const globalErrorHandler: ErrorRequestHandler = (
 
   if (error instanceof Prisma.PrismaClientValidationError) {
     const simplifiedError = handleValidationError(error);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorMessages = simplifiedError.errorMessages;
+  } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    const simplifiedError = handleClientError(error);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorMessages = simplifiedError.errorMessages;

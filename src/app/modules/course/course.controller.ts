@@ -1,12 +1,12 @@
+import { Course, CourseFaculty } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import catchAsync from '../../../shared/catchAsync';
-import sendResponse from '../../../shared/sendResponse';
-import { CourseService } from './course.service';
-import { courseFilterableFields } from './course.constant';
 import { paginationFields } from '../../../constants/pagination';
+import catchAsync from '../../../shared/catchAsync';
 import pick from '../../../shared/pick';
-import { Course, CourseFaculty } from '@prisma/client';
+import sendResponse from '../../../shared/sendResponse';
+import { courseFilterableFields } from './course.constant';
+import { CourseService } from './course.service';
 
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
   const result = await CourseService.insertIntoDB(req.body);
@@ -81,6 +81,20 @@ const assignFaculties = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const removeFaculties = catchAsync(async (req: Request, res: Response) => {
+  const result = await CourseService.removeFaculties(
+    req.params.id,
+    req.body.faculties
+  );
+
+  sendResponse<CourseFaculty[]>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Faculties removed successfully',
+    data: result,
+  });
+});
+
 export const CourseController = {
   insertIntoDB,
   getAllFromDB,
@@ -88,4 +102,5 @@ export const CourseController = {
   updateOneInDB,
   deleteByIdFromDB,
   assignFaculties,
+  removeFaculties,
 };

@@ -335,6 +335,7 @@ const removeFaculties = async (
     },
     include: {
       faculty: true,
+      course: true,
     },
   });
 

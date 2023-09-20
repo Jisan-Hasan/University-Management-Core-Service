@@ -17,6 +17,13 @@ router.post(
 router.get('/', CourseController.getAllFromDB);
 router.get('/:id', CourseController.getByIdFromDB);
 
+router.patch(
+  '/:id',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  validateRequest(CourseValidation.update),
+  CourseController.updateOneInDB
+);
+
 router.delete(
   '/:id',
   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),

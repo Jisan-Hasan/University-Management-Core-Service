@@ -161,6 +161,84 @@ const getByIdFromDB = async (id: string): Promise<Course | null> => {
   return result;
 };
 
+const updateOneInDB = async (
+  id: string,
+  payload: ICourseCreateData
+): Promise<Course | null> => {
+  const { preRequisiteCourses, ...courseData } = payload;
+
+  await prisma.$transaction(async transactionClient => {
+    const result = await transactionClient.course.update({
+      where: {
+        id,
+      },
+      data: courseData,
+    });
+
+    if (!result) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Unable to update course');
+    }
+
+    if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+      const deletePrerequisite = preRequisiteCourses.filter(
+        coursePrerequisite =>
+          coursePrerequisite.courseId && coursePrerequisite.isDeleted
+      );
+      const newPrerequisite = preRequisiteCourses.filter(
+        coursePrerequisite =>
+          coursePrerequisite.courseId && !coursePrerequisite.isDeleted
+      );
+
+      for (let index = 0; index < deletePrerequisite.length; index++) {
+        await transactionClient.courseToPrerequisite.deleteMany({
+          where: {
+            AND: [
+              {
+                courseId: id,
+              },
+              {
+                preRequisiteId: deletePrerequisite[index].courseId,
+              },
+            ],
+          },
+        });
+      }
+
+      for (let index = 0; index < newPrerequisite.length; index++) {
+        await transactionClient.courseToPrerequisite.create({
+          data: {
+            courseId: id,
+            preRequisiteId: newPrerequisite[index].courseId,
+          },
+        });
+      }
+    }
+
+    return result;
+  });
+
+  // get updated response data
+  const responseData = await prisma.course.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      preRequisite: {
+        include: {
+          preRequisite: true,
+        },
+      },
+      preRequisiteFor: {
+        include: {
+          course: true,
+        },
+      },
+    },
+  });
+
+  return responseData;
+};
+
 const deleteByIdFromDB = async (id: string): Promise<Course> => {
   const newCourse = await prisma.$transaction(async transactionClient => {
     const deletedCourseToPrerequisite =
@@ -205,4 +283,5 @@ export const CourseService = {
   getAllFromDB,
   getByIdFromDB,
   deleteByIdFromDB,
+  updateOneInDB,
 };

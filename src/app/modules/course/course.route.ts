@@ -14,4 +14,7 @@ router.post(
   CourseController.insertIntoDB
 );
 
+router.get('/', CourseController.getAllFromDB);
+// router.get('/:id', CourseController.getByIdFromDB);
+
 export const CourseRoutes = router;

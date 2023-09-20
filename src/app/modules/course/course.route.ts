@@ -15,6 +15,12 @@ router.post(
 );
 
 router.get('/', CourseController.getAllFromDB);
-// router.get('/:id', CourseController.getByIdFromDB);
+router.get('/:id', CourseController.getByIdFromDB);
+
+router.delete(
+  '/:id',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  CourseController.deleteByIdFromDB
+);
 
 export const CourseRoutes = router;

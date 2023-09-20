@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Course, Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
-import prisma from '../../../shared/prisma';
-import { ICourseCreateData, ICourseFilterRequest } from './course.interface';
-import { IPaginationOptions } from '../../../interfaces/pagination';
-import { IGenericResponse } from '../../../interfaces/common';
-import { Course, Prisma } from '@prisma/client';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
+import { IGenericResponse } from '../../../interfaces/common';
+import { IPaginationOptions } from '../../../interfaces/pagination';
+import prisma from '../../../shared/prisma';
 import { courseSearchableFields } from './course.constant';
+import { ICourseCreateData, ICourseFilterRequest } from './course.interface';
 
 const insertIntoDB = async (data: ICourseCreateData): Promise<any> => {
   const { preRequisiteCourses, ...courseData } = data;
@@ -139,7 +139,70 @@ const getAllFromDB = async (
   };
 };
 
+const getByIdFromDB = async (id: string): Promise<Course | null> => {
+  const result = await prisma.course.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      preRequisite: {
+        include: {
+          preRequisite: true,
+        },
+      },
+      preRequisiteFor: {
+        include: {
+          course: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
+const deleteByIdFromDB = async (id: string): Promise<Course> => {
+  const newCourse = await prisma.$transaction(async transactionClient => {
+    const deletedCourseToPrerequisite =
+      await transactionClient.courseToPrerequisite.deleteMany({
+        where: {
+          OR: [
+            {
+              courseId: id,
+            },
+            {
+              preRequisiteId: id,
+            },
+          ],
+        },
+      });
+
+    if (!deletedCourseToPrerequisite) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Unable to delete course pre-requisite'
+      );
+    }
+
+    const result = await transactionClient.course.delete({
+      where: {
+        id,
+      },
+    });
+
+    if (!result) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Unable to delete course');
+    }
+
+    return result;
+  });
+
+  return newCourse;
+};
+
 export const CourseService = {
   insertIntoDB,
   getAllFromDB,
+  getByIdFromDB,
+  deleteByIdFromDB,
 };

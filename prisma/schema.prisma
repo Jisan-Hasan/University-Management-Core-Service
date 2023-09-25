@@ -188,10 +188,11 @@ model SemesterRegistration {
   academicSemesterId String
   academicSemester   AcademicSemester @relation(fields: [academicSemesterId], references: [id])
 
-  offeredCourses               OfferedCourse[]
-  offeredCourseSections        OfferedCourseSection[]
-  offeredCourseClassSchedules  OfferedCourseClassSchedule[]
-  studentSemesterRegistrations StudentSemesterRegistration[]
+  offeredCourses                     OfferedCourse[]
+  offeredCourseSections              OfferedCourseSection[]
+  offeredCourseClassSchedules        OfferedCourseClassSchedule[]
+  studentSemesterRegistrations       StudentSemesterRegistration[]
+  studentSemesterRegistrationCourses StudentSemesterRegistrationCourse[]
 
   @@map("semester_registrations")
 }
@@ -271,14 +272,12 @@ model StudentSemesterRegistration {
   semesterRegistrationId String
   semesterRegistration   SemesterRegistration @relation(fields: [semesterRegistrationId], references: [id])
 
-  studentSemesterRegistrationCourses StudentSemesterRegistrationCourse[]
-
   @@map("student_semester_registrations")
 }
 
 model StudentSemesterRegistrationCourse {
   semesterRegistrationId String
-  semesterRegistration   StudentSemesterRegistration @relation(fields: [semesterRegistrationId], references: [id])
+  semesterRegistration   SemesterRegistration @relation(fields: [semesterRegistrationId], references: [id])
 
   studentId String
   student   Student @relation(fields: [studentId], references: [id])

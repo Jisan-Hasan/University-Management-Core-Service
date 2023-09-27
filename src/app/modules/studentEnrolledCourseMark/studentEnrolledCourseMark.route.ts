@@ -1,7 +1,7 @@
 import express from 'express';
-import { StudentEnrolledCourseMarkController } from './studentEnrolledCourseMark.controller';
-import auth from '../../middlewares/auth';
 import { ENUM_USER_ROLE } from '../../../enums/user';
+import auth from '../../middlewares/auth';
+import { StudentEnrolledCourseMarkController } from './studentEnrolledCourseMark.controller';
 
 const router = express.Router();
 
@@ -14,6 +14,11 @@ router.get(
 router.patch(
   '/update-marks',
   StudentEnrolledCourseMarkController.updateStudentMarks
+);
+
+router.patch(
+  '/update-final-marks',
+  StudentEnrolledCourseMarkController.updateFinalMarks
 );
 
 export const StudentEnrolledCourseMarkRoutes = router;
